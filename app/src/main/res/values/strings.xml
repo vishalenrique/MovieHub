@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">MovieHub</string>
+    <string name="action_settings">Settings</string>
+    <string name="movie_poster_content_description">Movie Poster</string>
+    <string name="sort_by_popularity">Sort by popularity</string>
+    <string name="sort_by_rating">Sort by rating</string>
+    <string name="popular">popular</string>
+    <string name="top_rating">top_rated</string>
+    <string name="title_activity_detail">DetailActivity</string>
+</resources>
