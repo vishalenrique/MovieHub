@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
 
         // Setting up the RecyclerView
         mRecyclerView = findViewById(R.id.rv_main);
-        mLayoutManager = new GridLayoutManager(this, calculateColumns());
+        mLayoutManager = new GridLayoutManager(this, 2);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mMovieAdapter = new MovieAdapter(this, mResults,this);
         mRecyclerView.setAdapter(mMovieAdapter);
@@ -143,10 +143,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
         startActivity(intent);
         }
 
-    public int calculateColumns() {
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        int noOfColumns = (int) (dpWidth / 150);
-        return noOfColumns;
-    }
+//    public int calculateColumns() {
+//        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+//        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+//        int noOfColumns = (int) (dpWidth / 150);
+//        return noOfColumns;
+//    }
 }
