@@ -7,4 +7,6 @@
     <string name="popular">popular</string>
     <string name="top_rating">top_rated</string>
     <string name="title_activity_detail">DetailActivity</string>
+    <string name="data_unavailable">No data available</string>
+    <string name="network_unavailable">Network not available</string>
 </resources>

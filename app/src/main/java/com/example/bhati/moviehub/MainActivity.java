@@ -1,12 +1,13 @@
 package com.example.bhati.moviehub;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,25 +16,23 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.onClicked{
+public class MainActivity extends AppCompatActivity implements MovieAdapter.onClicked {
 
     private RecyclerView mRecyclerView;
     private ProgressBar mProgressBar;
-    private List<Result> mResults = new ArrayList<>();
+    private ArrayList<Result> mResults = new ArrayList<>();
     private MovieAdapter mMovieAdapter;
     private GridLayoutManager mLayoutManager;
-
     String mCategory;
-    int mPage=1;
-
+    int mPage = 1;
     boolean mIsScrolling;
-    int mCurrentItems=0, mTotalItems=0, mScrolledOutItems=0;
+    int mCurrentItems = 0, mTotalItems = 0, mScrolledOutItems = 0;
+    private static final String RESULTS_KEY = "parcelableObjects";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +43,16 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
 
         mCategory = getString(R.string.popular);
         mProgressBar = findViewById(R.id.progress_bar);
-        mProgressBar.setVisibility(View.VISIBLE);
 
         // Setting up the RecyclerView
         mRecyclerView = findViewById(R.id.rv_main);
-        mLayoutManager = new GridLayoutManager(this, 2);
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            mLayoutManager = new GridLayoutManager(this, 2);
+        } else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mLayoutManager = new GridLayoutManager(this, 3);
+        }
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mMovieAdapter = new MovieAdapter(this, mResults,this);
+        mMovieAdapter = new MovieAdapter(this, mResults, this);
         mRecyclerView.setAdapter(mMovieAdapter);
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -78,7 +80,21 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
             }
         });
 
-        getData();
+        if (savedInstanceState == null) {
+            getData();
+        } else {
+            if (savedInstanceState.containsKey(RESULTS_KEY)) {
+                mResults.addAll(savedInstanceState.<Result>getParcelableArrayList(RESULTS_KEY));
+                mMovieAdapter.notifyDataSetChanged();
+                mProgressBar.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(RESULTS_KEY, mResults);
     }
 
     @Override
@@ -97,25 +113,28 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_popular) {
-            if(!mCategory.equals(getString(R.string.popular))) {
+            if (!mCategory.equals(getString(R.string.popular))) {
                 mCategory = getString(R.string.popular);
-                mPage=1;
-                mResults.clear();
+                resetRecyclerViewPosition();
                 getData();
             }
             return true;
-        }else if(id == R.id.action_rating){
-            if(!mCategory.equals(getString(R.string.top_rating))) {
+        } else if (id == R.id.action_rating) {
+            if (!mCategory.equals(getString(R.string.top_rating))) {
                 mCategory = getString(R.string.top_rating);
-                mPage = 1;
-                mResults.clear();
-                mMovieAdapter.notifyDataSetChanged();
+                resetRecyclerViewPosition();
                 getData();
             }
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void resetRecyclerViewPosition() {
+        mPage = 1;
+        mResults.clear();
+        mRecyclerView.scrollToPosition(0);
     }
 
     private void getData() {
@@ -125,28 +144,25 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
             public void onResponse(Call<MovieList> call, Response<MovieList> response) {
                 mProgressBar.setVisibility(View.GONE);
                 MovieList movieList = response.body();
-                mResults.addAll(movieList.getResults());
-                mMovieAdapter.notifyDataSetChanged();
+                if (movieList != null) {
+                    mResults.addAll(movieList.getResults());
+                    mMovieAdapter.notifyDataSetChanged();
+                } else {
+                   Snackbar.make(mRecyclerView, R.string.data_unavailable,Snackbar.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             public void onFailure(Call<MovieList> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "Failure", Toast.LENGTH_SHORT).show();
+                Snackbar.make(mRecyclerView, R.string.network_unavailable,Snackbar.LENGTH_SHORT).show();
             }
         });
     }
 
     @Override
     public void onClicked(Result result) {
-        Intent intent=new Intent(this,DetailActivity.class);
-        intent.putExtra(DetailActivity.EXTRA_RESULT_OBJECT,result);
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra(DetailActivity.EXTRA_RESULT_OBJECT, result);
         startActivity(intent);
-        }
-
-//    public int calculateColumns() {
-//        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-//        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-//        int noOfColumns = (int) (dpWidth / 150);
-//        return noOfColumns;
-//    }
+    }
 }
