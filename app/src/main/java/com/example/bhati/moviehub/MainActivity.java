@@ -23,6 +23,7 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.onClicked {
 
+    private static final String PAGE_KEY = "pageKey";
     private RecyclerView mRecyclerView;
     private ProgressBar mProgressBar;
     private ArrayList<Result> mResults = new ArrayList<>();
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
             getData();
         } else {
             if (savedInstanceState.containsKey(RESULTS_KEY)) {
+                mPage = savedInstanceState.getInt(PAGE_KEY);
                 mResults.addAll(savedInstanceState.<Result>getParcelableArrayList(RESULTS_KEY));
                 mMovieAdapter.notifyDataSetChanged();
                 mProgressBar.setVisibility(View.GONE);
@@ -95,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(RESULTS_KEY, mResults);
+        outState.putInt(PAGE_KEY,mPage);
     }
 
     @Override

@@ -9,4 +9,6 @@
     <string name="title_activity_detail">DetailActivity</string>
     <string name="data_unavailable">No data available</string>
     <string name="network_unavailable">Network not available</string>
+    <string name="rating">Rating: %s/10</string>
+    <string name="overview">Overview</string>
 </resources>

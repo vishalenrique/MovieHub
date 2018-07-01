@@ -11,7 +11,8 @@ public class MovieAPI {
 
     private static final String KEY = "";
     private static final String MOVIE_URL = "https://api.themoviedb.org/3/movie/";
-    public static final String IMAGE_URL = "http://image.tmdb.org/t/p/w500/";
+    public static final String IMAGE_URL = "http://image.tmdb.org/t/p/w185/";
+    public static final String IMAGE_URL_ORIGINAL = "http://image.tmdb.org/t/p/w780/";
     public static MovieService sMovieService;
 
     public static MovieService getService() {
