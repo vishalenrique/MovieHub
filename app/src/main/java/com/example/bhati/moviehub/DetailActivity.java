@@ -40,6 +40,11 @@ public class DetailActivity extends AppCompatActivity {
         mMovieOverview = findViewById(R.id.tv_movie_overview_detail);
         mResult = getIntent().getParcelableExtra(EXTRA_RESULT_OBJECT);
 
+        initializeUI();
+
+    }
+
+    private void initializeUI() {
         String imageUrl = MovieAPI.IMAGE_URL_ORIGINAL + mResult.getBackdropPath();
 
         Picasso.with(this)
@@ -54,8 +59,6 @@ public class DetailActivity extends AppCompatActivity {
         mMovieRating.setText(getString(R.string.rating,String.valueOf(mResult.getVoteAverage())));
         mMovieOverview.setText(mResult.getOverview());
 
-        Log.v(TAG, mResult.toString());
-        Log.v(TAG,imageUrl);
     }
 
 }
