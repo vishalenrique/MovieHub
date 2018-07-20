@@ -80,5 +80,15 @@
             app:layout_constraintStart_toStartOf="@+id/tv_movie_overview_label_detail"
             app:layout_constraintTop_toBottomOf="@+id/tv_movie_overview_label_detail"
             app:layout_constraintRight_toRightOf="parent"/>
+
+        <ImageView
+            android:id="@+id/iv_movie_favorite_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_favorite_border_red_48dp" />
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

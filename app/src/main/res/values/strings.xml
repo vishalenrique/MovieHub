@@ -11,4 +11,6 @@
     <string name="network_unavailable">Network not available</string>
     <string name="rating">Rating: %s/10</string>
     <string name="overview">Overview</string>
+    <string name="show_favorite">Show favorite</string>
+    <string name="favorite">favorite</string>
 </resources>

@@ -1,8 +1,11 @@
 package com.example.bhati.moviehub;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -16,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -34,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
     boolean mIsScrolling;
     int mCurrentItems = 0, mTotalItems = 0, mScrolledOutItems = 0;
     private static final String RESULTS_KEY = "parcelableObjects";
+    static boolean isFavoriteMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,15 +73,18 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                mCurrentItems = mLayoutManager.getChildCount();
-                mTotalItems = mLayoutManager.getItemCount();
-                mScrolledOutItems = mLayoutManager.findFirstVisibleItemPosition();
 
-                if (mIsScrolling && (mCurrentItems + mScrolledOutItems == mTotalItems)) {
-                    mIsScrolling = false;
-                    mPage++;
-                    mProgressBar.setVisibility(View.VISIBLE);
-                    getData();
+                if(!isFavoriteMode) {
+                    mCurrentItems = mLayoutManager.getChildCount();
+                    mTotalItems = mLayoutManager.getItemCount();
+                    mScrolledOutItems = mLayoutManager.findFirstVisibleItemPosition();
+
+                    if (mIsScrolling && (mCurrentItems + mScrolledOutItems == mTotalItems)) {
+                        mIsScrolling = false;
+                        mPage++;
+                        mProgressBar.setVisibility(View.VISIBLE);
+                        getData();
+                    }
                 }
             }
         });
@@ -90,6 +98,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
                 mMovieAdapter.notifyDataSetChanged();
                 mProgressBar.setVisibility(View.GONE);
             }
+        }
+        if(isFavoriteMode){
+            mCategory = getString(R.string.favorite);
+            setupViewModel();
         }
     }
 
@@ -114,19 +126,25 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_popular) {
             if (!mCategory.equals(getString(R.string.popular))) {
                 mCategory = getString(R.string.popular);
-                resetRecyclerViewPosition();
-                getData();
+                refreshUI();
             }
             return true;
         } else if (id == R.id.action_rating) {
             if (!mCategory.equals(getString(R.string.top_rating))) {
                 mCategory = getString(R.string.top_rating);
+                refreshUI();
+            }
+            return true;
+        } else if(id == R.id.action_favorite){
+            if(!mCategory.equals(getString(R.string.favorite))) {
+                mCategory = getString(R.string.favorite);
+                isFavoriteMode = true;
+                mProgressBar.setVisibility(View.GONE);
                 resetRecyclerViewPosition();
-                getData();
+                setupViewModel();
             }
             return true;
         }
@@ -134,10 +152,28 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
         return super.onOptionsItemSelected(item);
     }
 
+    private void refreshUI() {
+        isFavoriteMode = false;
+        mProgressBar.setVisibility(View.VISIBLE);
+        resetRecyclerViewPosition();
+        getData();
+    }
+
+    private void setupViewModel() {
+        MainViewModel mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        mainViewModel.getResults().observe(this, new Observer<List<Result>>() {
+            @Override
+            public void onChanged(@Nullable List<Result> results) {
+                mMovieAdapter.setResults(results);
+            }
+        });
+    }
+
     private void resetRecyclerViewPosition() {
         mPage = 1;
         mResults.clear();
         mRecyclerView.scrollToPosition(0);
+        mMovieAdapter.setResults(mResults);
     }
 
     private void getData() {
@@ -164,6 +200,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
 
     @Override
     public void onClicked(Result result) {
+        isFavoriteMode = false;
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(DetailActivity.EXTRA_RESULT_OBJECT, result);
         startActivity(intent);

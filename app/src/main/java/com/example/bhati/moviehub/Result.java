@@ -1,6 +1,10 @@
 
 package com.example.bhati.moviehub;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -10,43 +14,57 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@Entity(tableName = "movies")
 public class Result implements Parcelable{
+
 
     @SerializedName("vote_count")
     @Expose
+    
     private Integer voteCount;
     @SerializedName("id")
     @Expose
+    @PrimaryKey
     private Integer id;
     @SerializedName("video")
     @Expose
+    
     private Boolean video;
     @SerializedName("vote_average")
     @Expose
+    @ColumnInfo(name = "vote_average")
     private Double voteAverage;
     @SerializedName("title")
     @Expose
     private String title;
     @SerializedName("popularity")
     @Expose
+    
     private Double popularity;
     @SerializedName("poster_path")
     @Expose
+    @ColumnInfo(name = "poster_path")
     private String posterPath;
     @SerializedName("original_language")
     @Expose
+    
     private String originalLanguage;
     @SerializedName("original_title")
     @Expose
+    
     private String originalTitle;
     @SerializedName("genre_ids")
     @Expose
+
+    @Ignore
     private List<Integer> genreIds = null;
     @SerializedName("backdrop_path")
     @Expose
+    @ColumnInfo(name = "backdrop_path")
     private String backdropPath;
     @SerializedName("adult")
     @Expose
+    
     private Boolean adult;
     @SerializedName("overview")
     @Expose
@@ -55,6 +73,28 @@ public class Result implements Parcelable{
     @Expose
     private String releaseDate;
 
+//    private boolean isFavorite;
+//
+//    public boolean isFavorite() {
+//        return isFavorite;
+//    }
+//
+//    public void setFavorite(boolean favorite) {
+//        isFavorite = favorite;
+//    }
+
+    public Result(Integer id, Double voteAverage, String title, String posterPath, String backdropPath, String overview, String releaseDate) {
+        this.id = id;
+        this.voteAverage = voteAverage;
+        this.title = title;
+        this.posterPath = posterPath;
+        this.backdropPath = backdropPath;
+        this.overview = overview;
+        this.releaseDate = releaseDate;
+//        this.isFavorite = isFavorite;
+    }
+
+    @Ignore
     protected Result(Parcel in) {
         voteCount = in.readInt();
         id = in.readInt();
