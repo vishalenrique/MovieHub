@@ -9,9 +9,13 @@
     <string name="title_activity_detail">DetailActivity</string>
     <string name="data_unavailable">No data available</string>
     <string name="network_unavailable">Network not available</string>
-    <string name="rating">Rating: %s/10</string>
+    <string name="rating">Rating: %1$s/10</string>
     <string name="overview">Overview</string>
     <string name="show_favorite">Show favorite</string>
     <string name="favorite">favorite</string>
     <string name="trailers">Trailers</string>
+    <string name="review">Review</string>
+    <string name="random_name">Random name</string>
+    <string name="random_message">This is where comments will be shown</string>
+    <string name="comment_identifier">%1$d of %2$d</string>
 </resources>

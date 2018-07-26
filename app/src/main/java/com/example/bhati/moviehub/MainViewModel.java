@@ -5,6 +5,9 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 
+import com.example.bhati.moviehub.database.AppDatabase;
+import com.example.bhati.moviehub.movieList.Result;
+
 import java.util.List;
 
 public class MainViewModel extends AndroidViewModel {

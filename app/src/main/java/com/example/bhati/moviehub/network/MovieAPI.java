@@ -1,5 +1,6 @@
-package com.example.bhati.moviehub;
+package com.example.bhati.moviehub.network;
 
+import com.example.bhati.moviehub.movieList.MovieList;
 import com.example.bhati.moviehub.reviews.MovieReviews;
 import com.example.bhati.moviehub.videos.MovieVideos;
 

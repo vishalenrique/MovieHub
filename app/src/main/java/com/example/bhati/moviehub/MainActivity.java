@@ -16,7 +16,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
+
+import com.example.bhati.moviehub.movieList.MovieAdapter;
+import com.example.bhati.moviehub.movieList.MovieList;
+import com.example.bhati.moviehub.movieList.Result;
+import com.example.bhati.moviehub.network.MovieAPI;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,6 @@
-package com.example.bhati.moviehub;
+package com.example.bhati.moviehub.movieList;
 
 import android.content.Context;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.bhati.moviehub.network.MovieAPI;
+import com.example.bhati.moviehub.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

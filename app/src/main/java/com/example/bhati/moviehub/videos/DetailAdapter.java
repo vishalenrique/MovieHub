@@ -1,4 +1,4 @@
-package com.example.bhati.moviehub;
+package com.example.bhati.moviehub.videos;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,7 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.bhati.moviehub.videos.Result;
+import com.example.bhati.moviehub.network.MovieAPI;
+import com.example.bhati.moviehub.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

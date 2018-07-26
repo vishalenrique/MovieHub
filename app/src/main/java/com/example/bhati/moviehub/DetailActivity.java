@@ -17,7 +17,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.bhati.moviehub.database.AppDatabase;
+import com.example.bhati.moviehub.movieList.Result;
+import com.example.bhati.moviehub.network.MovieAPI;
+import com.example.bhati.moviehub.reviews.DetailReviewAdapter;
 import com.example.bhati.moviehub.reviews.MovieReviews;
+import com.example.bhati.moviehub.videos.DetailAdapter;
 import com.example.bhati.moviehub.videos.MovieVideos;
 import com.squareup.picasso.Picasso;
 
@@ -39,6 +44,8 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
     private TextView mMovieOverview;
     private ImageView mMovieFavorite;
     private RecyclerView mRecyclerView;
+    private RecyclerView mReviewRecyclerView;
+    private DetailReviewAdapter mReviewAdapter;
     private DetailAdapter mAdapter;
 
     boolean isFavorite;
@@ -62,14 +69,22 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
         mMovieFavorite = findViewById(R.id.iv_movie_favorite_detail);
         mResult = getIntent().getParcelableExtra(EXTRA_RESULT_OBJECT);
         mRecyclerView = findViewById(R.id.rv_movie_detail);
+        mReviewRecyclerView = findViewById(R.id.rv_movie_review_detail);
         mDatabase = AppDatabase.getInstance(this.getApplicationContext());
 
-        //setting up recycler view
+        //setting up recycler view for trailers
 
         mAdapter = new DetailAdapter(null,this,mResult.getPosterPath(),this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mAdapter);
+
+        //settting up recycler view for reviews
+        mReviewAdapter = new DetailReviewAdapter(null,this);
+        LinearLayoutManager reviewLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
+        mReviewRecyclerView.setLayoutManager(reviewLayoutManager);
+        mReviewRecyclerView.setAdapter(mReviewAdapter);
+
 
         getSupportActionBar().setTitle(mResult.getTitle());
         setupFavoriteIcon();
@@ -98,8 +113,10 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
             @Override
             public void onResponse(Call<MovieReviews> call, Response<MovieReviews> response) {
                 MovieReviews movieReviews = response.body();
-                assert movieReviews != null;
-                Log.d(TAG,"Reviews : "+movieReviews.getResults().size()+"");
+              if(movieReviews != null){
+                  Log.d(TAG,"Reviews : "+movieReviews.getResults().size()+"");
+                  mReviewAdapter.setResults(movieReviews.getResults());
+              }
             }
 
             @Override

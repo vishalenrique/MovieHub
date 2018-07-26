@@ -4,6 +4,9 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
+import com.example.bhati.moviehub.database.AppDatabase;
+import com.example.bhati.moviehub.movieList.Result;
+
 public class AddMovieViewModelFactory extends ViewModelProvider.NewInstanceFactory {
     private AppDatabase mDatabase;
     private Result mResult;

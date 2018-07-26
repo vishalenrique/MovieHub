@@ -1,10 +1,12 @@
-package com.example.bhati.moviehub;
+package com.example.bhati.moviehub.database;
 
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 import android.util.Log;
+
+import com.example.bhati.moviehub.movieList.Result;
 
 @Database(entities = Result.class,version = 1,exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
