@@ -12,7 +12,6 @@
         android:paddingBottom="16dp"
         tools:context=".DetailActivity"
         tools:showIn="@layout/activity_detail">
-
         <ImageView
             android:id="@+id/iv_movie_backdrop_detail"
             android:layout_width="0dp"
@@ -21,6 +20,15 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/iv_movie_favorite_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_favorite_border_red_48dp" />
 
         <ImageView
             android:id="@+id/iv_movie_poster_detail"
@@ -77,18 +85,32 @@
             android:id="@+id/tv_movie_overview_detail"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            tools:text="saaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
             app:layout_constraintStart_toStartOf="@+id/tv_movie_overview_label_detail"
             app:layout_constraintTop_toBottomOf="@+id/tv_movie_overview_label_detail"
             app:layout_constraintRight_toRightOf="parent"/>
 
-        <ImageView
-            android:id="@+id/iv_movie_favorite_detail"
+        <TextView
+            android:id="@+id/tv_movie_trailer_label_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:text="@string/trailers"
+            app:layout_constraintTop_toBottomOf="@id/tv_movie_overview_detail"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_marginStart="8dp"
+            android:id="@+id/rv_movie_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_favorite_border_red_48dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_movie_trailer_label_detail"
+            tools:listitem="@layout/each_item_detail" />
+
+
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

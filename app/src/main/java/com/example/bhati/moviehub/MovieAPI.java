@@ -1,5 +1,8 @@
 package com.example.bhati.moviehub;
 
+import com.example.bhati.moviehub.reviews.MovieReviews;
+import com.example.bhati.moviehub.videos.MovieVideos;
+
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -30,6 +33,12 @@ public class MovieAPI {
     public interface MovieService {
         @GET("{category}/?api_key=" + KEY)
         Call<MovieList> getMovieList(@Path("category") String category, @Query("page") int page);
+
+        @GET("{id}/videos?api_key=" + KEY)
+        Call<MovieVideos> getMovieVideos(@Path("id") int id);
+
+        @GET("{id}/reviews?api_key=" + KEY)
+        Call<MovieReviews> getMovieReviews(@Path("id") int id, @Query("page") int page);
     }
 
 }
