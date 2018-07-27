@@ -22,6 +22,7 @@ import com.example.bhati.moviehub.movieList.Result;
 import com.example.bhati.moviehub.network.MovieAPI;
 import com.example.bhati.moviehub.reviews.DetailReviewAdapter;
 import com.example.bhati.moviehub.reviews.MovieReviews;
+import com.example.bhati.moviehub.reviews.ReviewDialogFragment;
 import com.example.bhati.moviehub.videos.DetailAdapter;
 import com.example.bhati.moviehub.videos.MovieVideos;
 import com.squareup.picasso.Picasso;
@@ -30,7 +31,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class DetailActivity extends AppCompatActivity implements DetailAdapter.OnClickTrailer {
+public class DetailActivity extends AppCompatActivity implements DetailAdapter.OnClickTrailer,DetailReviewAdapter.onReviewClicked {
 
     private static final String TAG = DetailActivity.class.getSimpleName();
     public static final String EXTRA_RESULT_OBJECT = "resultObject";
@@ -80,7 +81,7 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
         mRecyclerView.setAdapter(mAdapter);
 
         //settting up recycler view for reviews
-        mReviewAdapter = new DetailReviewAdapter(null,this);
+        mReviewAdapter = new DetailReviewAdapter(null,this,this);
         LinearLayoutManager reviewLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
         mReviewRecyclerView.setLayoutManager(reviewLayoutManager);
         mReviewRecyclerView.setAdapter(mReviewAdapter);
@@ -221,5 +222,16 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
         } catch (ActivityNotFoundException ex) {
             context.startActivity(webIntent);
         }
+    }
+
+    @Override
+    public void onClicked(com.example.bhati.moviehub.reviews.Result result, int position, int size) {
+        ReviewDialogFragment dialogFragment = new ReviewDialogFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ReviewDialogFragment.BUNDLED_RESULT,result);
+        bundle.putInt(ReviewDialogFragment.BUNDLED_POSITION,position);
+        bundle.putInt(ReviewDialogFragment.BUNDLED_NUMBER_OF_COMMENTS,size);
+        dialogFragment.setArguments(bundle);
+        dialogFragment.show(getSupportFragmentManager(),"Review Fragment");
     }
 }

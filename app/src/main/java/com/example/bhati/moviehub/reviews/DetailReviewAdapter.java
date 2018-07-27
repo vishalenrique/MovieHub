@@ -18,10 +18,16 @@ public class DetailReviewAdapter extends RecyclerView.Adapter<DetailReviewAdapte
 
     private List<Result> mResults;
     private Context mContext;
+    private onReviewClicked mOnReviewClicked;
 
-    public DetailReviewAdapter(List<Result> results, Context context) {
+    public interface onReviewClicked{
+        void onClicked(Result result, int position, int size);
+    }
+
+    public DetailReviewAdapter(List<Result> results, Context context, onReviewClicked onReviewClicked) {
         mResults = results;
         mContext = context;
+        mOnReviewClicked = onReviewClicked;
     }
 
     @NonNull
@@ -33,12 +39,19 @@ public class DetailReviewAdapter extends RecyclerView.Adapter<DetailReviewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull DetailReviewViewHolder holder, int position) {
-        Result result = mResults.get(position);
+        final Result result = mResults.get(position);
         holder.mImageView.setImageResource(R.drawable.ic_favorite_red_48dp);
         holder.mProfileName.setText(result.getAuthor());
         holder.mProfileReview.setText(result.getContent());
-        int commentNumber = ++position;
+        final int commentNumber = ++position;
         holder.mReviewIdentifier.setText(mContext.getString(R.string.comment_identifier, commentNumber, mResults.size()));
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mOnReviewClicked.onClicked(result, commentNumber,mResults.size());
+            }
+        });
     }
 
     public void setResults(List<Result> results) {
