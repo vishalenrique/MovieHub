@@ -32,6 +32,7 @@ public class ReviewDialogFragment extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         getDialog().setTitle("Full review");
+        getDialog().setCanceledOnTouchOutside(true);
 
         View view = inflater.inflate(R.layout.review_fragment,container,false);
         mProfileImage = view.findViewById(R.id.profile_image);
