@@ -47,9 +47,11 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:ellipsize="end"
             android:maxLines="2"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:textSize="18sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/iv_movie_poster_detail"
             app:layout_constraintTop_toBottomOf="@+id/iv_movie_backdrop_detail"
@@ -60,7 +62,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Light.SearchResult.Subtitle"
             app:layout_constraintStart_toStartOf="@+id/tv_movie_title_detail"
             app:layout_constraintTop_toBottomOf="@+id/tv_movie_title_detail"
             tools:text="25-05-2018" />
@@ -70,7 +71,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             app:layout_constraintStart_toStartOf="@+id/tv_movie_release_detail"
             app:layout_constraintTop_toBottomOf="@+id/tv_movie_release_detail" />
 
@@ -79,6 +79,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:text="@string/overview"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -98,9 +100,10 @@
             android:id="@+id/tv_movie_trailer_label_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:text="@string/trailers"
-            app:layout_constraintLeft_toLeftOf="parent"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="@id/tv_movie_overview_detail"
             app:layout_constraintTop_toBottomOf="@id/tv_movie_overview_detail" />
 
         <android.support.v7.widget.RecyclerView
@@ -109,8 +112,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/tv_movie_trailer_label_detail"
             app:layout_constraintTop_toBottomOf="@+id/tv_movie_trailer_label_detail"
             tools:listitem="@layout/each_item_detail" />
 
@@ -118,11 +122,12 @@
             android:id="@+id/tv_movie_trailer_empty_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No trailers available"
-            app:layout_constraintTop_toTopOf="@id/rv_movie_detail"
+            android:layout_margin="8dp"
+            android:text="@string/no_trailers_available"
             app:layout_constraintBottom_toBottomOf="@id/rv_movie_detail"
             app:layout_constraintLeft_toLeftOf="@id/rv_movie_detail"
-            app:layout_constraintRight_toRightOf="@id/rv_movie_detail"/>
+            app:layout_constraintRight_toRightOf="@id/rv_movie_detail"
+            app:layout_constraintTop_toTopOf="@id/rv_movie_detail" />
 
         <TextView
             android:id="@+id/tv_movie_review_label_detail"
@@ -130,6 +135,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/review"
+            android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="@id/rv_movie_detail"
             app:layout_constraintTop_toBottomOf="@id/rv_movie_detail" />
 
@@ -137,7 +143,9 @@
             android:id="@+id/rv_movie_review_detail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/tv_movie_review_label_detail"
             app:layout_constraintTop_toBottomOf="@+id/tv_movie_review_label_detail"
@@ -148,11 +156,12 @@
             android:id="@+id/tv_movie_review_empty_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No reviews available"
-            app:layout_constraintTop_toTopOf="@id/rv_movie_review_detail"
+            android:layout_margin="16dp"
+            android:text="@string/no_reviews_available"
             app:layout_constraintBottom_toBottomOf="@id/rv_movie_review_detail"
             app:layout_constraintLeft_toLeftOf="@id/rv_movie_review_detail"
-            app:layout_constraintRight_toRightOf="@id/rv_movie_review_detail"/>
+            app:layout_constraintRight_toRightOf="@id/rv_movie_review_detail"
+            app:layout_constraintTop_toTopOf="@id/rv_movie_review_detail" />
 
 
     </android.support.constraint.ConstraintLayout>
