@@ -5,17 +5,12 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -34,9 +29,7 @@ import com.example.bhati.moviehub.reviews.ReviewDialogFragment;
 import com.example.bhati.moviehub.videos.DetailAdapter;
 import com.example.bhati.moviehub.videos.MovieVideos;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
-import java.io.IOException;
 import java.util.List;
 
 import retrofit2.Call;
@@ -63,6 +56,10 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
     AppDatabase mDatabase;
     private TextView mTrailerEmptyView;
     private TextView mReviewEmptyView;
+    private RecyclerView mTrailerRecyclerView;
+    private RecyclerView mReviewRecyclerView;
+    private TextView mTrailerLabel;
+    private TextView mReviewLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,10 +77,10 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
         mMovieRating = findViewById(R.id.tv_movie_rating_detail);
         mMovieOverview = findViewById(R.id.tv_movie_overview_detail);
         mMovieFavorite = findViewById(R.id.iv_movie_favorite_detail);
-        RecyclerView trailerRecyclerView = findViewById(R.id.rv_movie_detail);
-        RecyclerView reviewRecyclerView = findViewById(R.id.rv_movie_review_detail);
-        TextView trailerLabel = findViewById(R.id.tv_movie_trailer_label_detail);
-        TextView reviewLabel = findViewById(R.id.tv_movie_review_label_detail);
+        mTrailerRecyclerView = findViewById(R.id.rv_movie_detail);
+        mReviewRecyclerView = findViewById(R.id.rv_movie_review_detail);
+        mTrailerLabel = findViewById(R.id.tv_movie_trailer_label_detail);
+        mReviewLabel = findViewById(R.id.tv_movie_review_label_detail);
         mTrailerEmptyView = findViewById(R.id.tv_movie_trailer_empty_detail);
         mReviewEmptyView = findViewById(R.id.tv_movie_review_empty_detail);
 
@@ -100,30 +97,24 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
 
         if (isConnected) {
 
-            trailerRecyclerView.setVisibility(View.VISIBLE);
-            reviewRecyclerView.setVisibility(View.VISIBLE);
-            trailerLabel.setVisibility(View.VISIBLE);
-            reviewLabel.setVisibility(View.VISIBLE);
+            manageVisibility(mTrailerRecyclerView, mReviewRecyclerView, mTrailerLabel, mReviewLabel, View.VISIBLE);
 
             //setting up recycler view for trailers
             mAdapter = new DetailAdapter(null, this, mResult.getPosterPath(), this);
             LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-            trailerRecyclerView.setLayoutManager(layoutManager);
-            trailerRecyclerView.setAdapter(mAdapter);
+            mTrailerRecyclerView.setLayoutManager(layoutManager);
+            mTrailerRecyclerView.setAdapter(mAdapter);
 
             //settting up recycler view for reviews
             mReviewAdapter = new DetailReviewAdapter(null, this, this);
             LinearLayoutManager reviewLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-            reviewRecyclerView.setLayoutManager(reviewLayoutManager);
-            reviewRecyclerView.setAdapter(mReviewAdapter);
+            mReviewRecyclerView.setLayoutManager(reviewLayoutManager);
+            mReviewRecyclerView.setAdapter(mReviewAdapter);
 
             setupTrailers();
             setupReviews();
         } else {
-            trailerRecyclerView.setVisibility(View.GONE);
-            reviewRecyclerView.setVisibility(View.GONE);
-            trailerLabel.setVisibility(View.GONE);
-            reviewLabel.setVisibility(View.GONE);
+            manageVisibility(mTrailerRecyclerView, mReviewRecyclerView, mTrailerLabel, mReviewLabel, View.GONE);
         }
 
         mMovieFavorite.setOnClickListener(new View.OnClickListener() {
@@ -141,6 +132,13 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
             }
         });
 
+    }
+
+    private void manageVisibility(RecyclerView trailerRecyclerView, RecyclerView reviewRecyclerView, TextView trailerLabel, TextView reviewLabel, int visibility) {
+        trailerRecyclerView.setVisibility(visibility);
+        reviewRecyclerView.setVisibility(visibility);
+        trailerLabel.setVisibility(visibility);
+        reviewLabel.setVisibility(visibility);
     }
 
     private boolean isNetworkAvailable() {
@@ -165,12 +163,13 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
                         Log.d(TAG, "Reviews : " + results.size() + "");
                         mReviewAdapter.setResults(results);
                     }
+                }else{
+                    manageVisibility(mTrailerRecyclerView, mReviewRecyclerView, mTrailerLabel, mReviewLabel, View.GONE);
                 }
             }
 
             @Override
             public void onFailure(Call<MovieReviews> call, Throwable t) {
-
             }
         });
     }
@@ -189,12 +188,13 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
                         Log.d(TAG, "Videos : " + results.size());
                         mAdapter.setResults(results);
                     }
+                }else{
+                    manageVisibility(mTrailerRecyclerView, mReviewRecyclerView, mTrailerLabel, mReviewLabel, View.GONE);
                 }
             }
 
             @Override
             public void onFailure(Call<MovieVideos> call, Throwable t) {
-
             }
         });
     }

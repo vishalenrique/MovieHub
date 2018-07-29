@@ -22,6 +22,14 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/gradient_bg"
+            app:layout_constraintRight_toRightOf="@id/iv_movie_backdrop_detail"
+            app:layout_constraintLeft_toLeftOf="@id/iv_movie_backdrop_detail"
+            app:layout_constraintTop_toTopOf="@id/iv_movie_backdrop_detail"
+            app:layout_constraintBottom_toBottomOf="@id/iv_movie_backdrop_detail"/>
 
         <ImageView
             android:id="@+id/iv_movie_favorite_detail"
