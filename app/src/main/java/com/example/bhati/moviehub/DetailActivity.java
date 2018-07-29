@@ -5,6 +5,8 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -27,6 +29,8 @@ import com.example.bhati.moviehub.videos.DetailAdapter;
 import com.example.bhati.moviehub.videos.MovieVideos;
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -44,22 +48,22 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
     private TextView mMovieRating;
     private TextView mMovieOverview;
     private ImageView mMovieFavorite;
-    private RecyclerView mRecyclerView;
-    private RecyclerView mReviewRecyclerView;
     private DetailReviewAdapter mReviewAdapter;
     private DetailAdapter mAdapter;
 
     boolean isFavorite;
     AppDatabase mDatabase;
+    private TextView mTrailerEmptyView;
+    private TextView mReviewEmptyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
         mMovieBackdropImage = findViewById(R.id.iv_movie_backdrop_detail);
         mMoviePosterImage = findViewById(R.id.iv_movie_poster_detail);
@@ -68,30 +72,50 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
         mMovieRating = findViewById(R.id.tv_movie_rating_detail);
         mMovieOverview = findViewById(R.id.tv_movie_overview_detail);
         mMovieFavorite = findViewById(R.id.iv_movie_favorite_detail);
+        RecyclerView trailerRecyclerView = findViewById(R.id.rv_movie_detail);
+        RecyclerView reviewRecyclerView = findViewById(R.id.rv_movie_review_detail);
+        TextView trailerLabel = findViewById(R.id.tv_movie_trailer_label_detail);
+        TextView reviewLabel = findViewById(R.id.tv_movie_review_label_detail);
+        mTrailerEmptyView = findViewById(R.id.tv_movie_trailer_empty_detail);
+        mReviewEmptyView = findViewById(R.id.tv_movie_review_empty_detail);
+
+
         mResult = getIntent().getParcelableExtra(EXTRA_RESULT_OBJECT);
-        mRecyclerView = findViewById(R.id.rv_movie_detail);
-        mReviewRecyclerView = findViewById(R.id.rv_movie_review_detail);
         mDatabase = AppDatabase.getInstance(this.getApplicationContext());
-
-        //setting up recycler view for trailers
-
-        mAdapter = new DetailAdapter(null,this,mResult.getPosterPath(),this);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setAdapter(mAdapter);
-
-        //settting up recycler view for reviews
-        mReviewAdapter = new DetailReviewAdapter(null,this,this);
-        LinearLayoutManager reviewLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        mReviewRecyclerView.setLayoutManager(reviewLayoutManager);
-        mReviewRecyclerView.setAdapter(mReviewAdapter);
-
+        boolean isConnected = isNetworkAvailable();
 
         getSupportActionBar().setTitle(mResult.getTitle());
-        setupFavoriteIcon();
         initializeUI();
-        setupTrailers();
-        setupReviews();
+
+        if(isConnected) {
+
+            trailerRecyclerView.setVisibility(View.VISIBLE);
+            reviewRecyclerView.setVisibility(View.VISIBLE);
+            trailerLabel.setVisibility(View.VISIBLE);
+            reviewLabel.setVisibility(View.VISIBLE);
+            mTrailerEmptyView.setVisibility(View.GONE);
+            mReviewEmptyView.setVisibility(View.GONE);
+
+            //setting up recycler view for trailers
+            mAdapter = new DetailAdapter(null, this, mResult.getPosterPath(), this);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+            trailerRecyclerView.setLayoutManager(layoutManager);
+            trailerRecyclerView.setAdapter(mAdapter);
+
+            //settting up recycler view for reviews
+            mReviewAdapter = new DetailReviewAdapter(null, this, this);
+            LinearLayoutManager reviewLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+            reviewRecyclerView.setLayoutManager(reviewLayoutManager);
+            reviewRecyclerView.setAdapter(mReviewAdapter);
+
+            setupTrailers();
+            setupReviews();
+        }else{
+            trailerRecyclerView.setVisibility(View.GONE);
+            reviewRecyclerView.setVisibility(View.GONE);
+            trailerLabel.setVisibility(View.GONE);
+            reviewLabel.setVisibility(View.GONE);
+        }
 
         mMovieFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,10 +126,18 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
                     mMovieFavorite.setImageResource(R.drawable.ic_favorite_red_48dp);
                 }
                 databaseOperations(isFavorite);
-                isFavorite=!isFavorite;
+                isFavorite =!isFavorite;
             }
         });
 
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null &&
+                activeNetworkInfo.isConnectedOrConnecting();
     }
 
     private void setupReviews() {
@@ -115,8 +147,13 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
             public void onResponse(Call<MovieReviews> call, Response<MovieReviews> response) {
                 MovieReviews movieReviews = response.body();
               if(movieReviews != null){
-                  Log.d(TAG,"Reviews : "+movieReviews.getResults().size()+"");
-                  mReviewAdapter.setResults(movieReviews.getResults());
+                  List<com.example.bhati.moviehub.reviews.Result> results = movieReviews.getResults();
+                  if(results.size()==0){
+                   mReviewEmptyView.setVisibility(View.VISIBLE);
+                  }else {
+                      Log.d(TAG, "Reviews : " + results.size() + "");
+                      mReviewAdapter.setResults(results);
+                  }
               }
             }
 
@@ -134,8 +171,13 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
             public void onResponse(Call<MovieVideos> call, Response<MovieVideos> response) {
                 MovieVideos movieVideos = response.body();
               if( movieVideos != null) {
-                  Log.d(TAG, "Videos : " + movieVideos.getResults().size());
-                  mAdapter.setResults(movieVideos.getResults());
+                  List<com.example.bhati.moviehub.videos.Result> results = movieVideos.getResults();
+                  if(results.size() == 0){
+                      mTrailerEmptyView.setVisibility(View.VISIBLE);
+                  }else {
+                      Log.d(TAG, "Videos : " + results.size());
+                      mAdapter.setResults(results);
+                  }
               }
             }
 
@@ -172,7 +214,7 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
         mMovieRating.setText(getString(R.string.rating,String.valueOf(mResult.getVoteAverage())));
         mMovieOverview.setText(mResult.getOverview());
 
-
+        setupFavoriteIcon();
     }
 
     private void setupFavoriteIcon() {
@@ -187,19 +229,9 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
                     @Override
                     public void run() {
                         if(isFavorite){
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
                                     mMovieFavorite.setImageResource(R.drawable.ic_favorite_red_48dp);
-                                }
-                            });
                         }else {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
                                     mMovieFavorite.setImageResource(R.drawable.ic_favorite_border_red_48dp);
-                                }
-                            });
                         }
                     }
                 });
@@ -226,6 +258,7 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
 
     @Override
     public void onClicked(com.example.bhati.moviehub.reviews.Result result, int position, int size) {
+        //Opening review in new fragment
         ReviewDialogFragment dialogFragment = new ReviewDialogFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(ReviewDialogFragment.BUNDLED_RESULT,result);

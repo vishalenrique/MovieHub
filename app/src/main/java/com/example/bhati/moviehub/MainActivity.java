@@ -2,20 +2,28 @@ package com.example.bhati.moviehub;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.bhati.moviehub.movieList.MovieAdapter;
 import com.example.bhati.moviehub.movieList.MovieList;
@@ -31,18 +39,19 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.onClicked {
 
+    private static final String TAG = "MainActivity";
     private static final String PAGE_KEY = "pageKey";
     private RecyclerView mRecyclerView;
     private ProgressBar mProgressBar;
     private ArrayList<Result> mResults = new ArrayList<>();
     private MovieAdapter mMovieAdapter;
     private GridLayoutManager mLayoutManager;
-    String mCategory;
+    String mCategory = "";
     int mPage = 1;
     boolean mIsScrolling;
     int mCurrentItems = 0, mTotalItems = 0, mScrolledOutItems = 0;
     private static final String RESULTS_KEY = "parcelableObjects";
-    static boolean isFavoriteMode;
+    boolean isConnected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mCategory = getString(R.string.popular);
+        isConnected = isNetworkAvailable();
         mProgressBar = findViewById(R.id.progress_bar);
 
         // Setting up the RecyclerView
@@ -78,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                if(!isFavoriteMode) {
+                if (!isFavoriteMode()) {
                     mCurrentItems = mLayoutManager.getChildCount();
                     mTotalItems = mLayoutManager.getItemCount();
                     mScrolledOutItems = mLayoutManager.findFirstVisibleItemPosition();
@@ -93,27 +102,49 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
             }
         });
 
+
         if (savedInstanceState == null) {
-            getData();
+            if (!isFavoriteMode()) {
+                mCategory = getString(R.string.popular);
+                getData();
+            }
         } else {
-            if (savedInstanceState.containsKey(RESULTS_KEY)) {
+            if (savedInstanceState.containsKey(RESULTS_KEY)){
                 mPage = savedInstanceState.getInt(PAGE_KEY);
                 mResults.addAll(savedInstanceState.<Result>getParcelableArrayList(RESULTS_KEY));
+                mCategory = savedInstanceState.getString("category");
                 mMovieAdapter.notifyDataSetChanged();
+                if(mResults.size()>0)
                 mProgressBar.setVisibility(View.GONE);
             }
         }
-        if(isFavoriteMode){
-            mCategory = getString(R.string.favorite);
-            setupViewModel();
+
+        if (isFavoriteMode()) {
+            setupFavoriteMode();
+        } else if (!isFavoriteMode() && !isConnected) {
+            Snackbar.make(mRecyclerView, R.string.network_unavailable, Snackbar.LENGTH_SHORT).show();
         }
+
+    }
+
+    private boolean isFavoriteMode() {
+        return mCategory.equals(getString(R.string.favorite));
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null &&
+                activeNetworkInfo.isConnectedOrConnecting();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putString("category", mCategory);
         outState.putParcelableArrayList(RESULTS_KEY, mResults);
-        outState.putInt(PAGE_KEY,mPage);
+        outState.putInt(PAGE_KEY, mPage);
     }
 
     @Override
@@ -134,21 +165,23 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
             if (!mCategory.equals(getString(R.string.popular))) {
                 mCategory = getString(R.string.popular);
                 refreshUI();
+            }else{
+                Snackbar.make(mRecyclerView,"Sorted by "+mCategory,Snackbar.LENGTH_SHORT).show();
             }
             return true;
         } else if (id == R.id.action_rating) {
             if (!mCategory.equals(getString(R.string.top_rating))) {
                 mCategory = getString(R.string.top_rating);
                 refreshUI();
+            }else{
+                Snackbar.make(mRecyclerView,"Sorted by "+mCategory,Snackbar.LENGTH_SHORT).show();
             }
             return true;
-        } else if(id == R.id.action_favorite){
-            if(!mCategory.equals(getString(R.string.favorite))) {
-                mCategory = getString(R.string.favorite);
-                isFavoriteMode = true;
-                mProgressBar.setVisibility(View.GONE);
-                resetRecyclerViewPosition();
-                setupViewModel();
+        } else if (id == R.id.action_favorite) {
+            if (!isFavoriteMode()) {
+                setupFavoriteMode();
+            }else{
+                Snackbar.make(mRecyclerView,"Sorted by "+mCategory,Snackbar.LENGTH_SHORT).show();
             }
             return true;
         }
@@ -156,8 +189,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
         return super.onOptionsItemSelected(item);
     }
 
+    private void setupFavoriteMode() {
+        mCategory = getString(R.string.favorite);
+        mProgressBar.setVisibility(View.VISIBLE);
+        resetRecyclerViewPosition();
+        setupViewModel();
+    }
+
     private void refreshUI() {
-        isFavoriteMode = false;
         mProgressBar.setVisibility(View.VISIBLE);
         resetRecyclerViewPosition();
         getData();
@@ -168,7 +207,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
         mainViewModel.getResults().observe(this, new Observer<List<Result>>() {
             @Override
             public void onChanged(@Nullable List<Result> results) {
-                mMovieAdapter.setResults(results);
+                if(results.size()==0){
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    Snackbar.make(mRecyclerView,R.string.no_favorite,Snackbar.LENGTH_SHORT).show();
+                }else{
+                    mProgressBar.setVisibility(View.GONE);
+                }
+                    if (isFavoriteMode()) {
+                        mResults.clear();
+                        mResults.addAll(results);
+                        mMovieAdapter.setResults(mResults);
+                    }
             }
         });
     }
@@ -191,20 +240,19 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.onCl
                     mResults.addAll(movieList.getResults());
                     mMovieAdapter.notifyDataSetChanged();
                 } else {
-                   Snackbar.make(mRecyclerView, R.string.data_unavailable,Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(mRecyclerView, R.string.data_unavailable, Snackbar.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<MovieList> call, Throwable t) {
-                Snackbar.make(mRecyclerView, R.string.network_unavailable,Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mRecyclerView, R.string.network_unavailable, Snackbar.LENGTH_SHORT).show();
             }
         });
     }
 
     @Override
     public void onClicked(Result result) {
-        isFavoriteMode = false;
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(DetailActivity.EXTRA_RESULT_OBJECT, result);
         startActivity(intent);

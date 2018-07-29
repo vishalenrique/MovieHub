@@ -115,6 +115,16 @@
             tools:listitem="@layout/each_item_detail" />
 
         <TextView
+            android:id="@+id/tv_movie_trailer_empty_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No trailers available"
+            app:layout_constraintTop_toTopOf="@id/rv_movie_detail"
+            app:layout_constraintBottom_toBottomOf="@id/rv_movie_detail"
+            app:layout_constraintLeft_toLeftOf="@id/rv_movie_detail"
+            app:layout_constraintRight_toRightOf="@id/rv_movie_detail"/>
+
+        <TextView
             android:id="@+id/tv_movie_review_label_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -132,6 +142,17 @@
             app:layout_constraintStart_toStartOf="@+id/tv_movie_review_label_detail"
             app:layout_constraintTop_toBottomOf="@+id/tv_movie_review_label_detail"
             tools:listitem="@layout/review_layout" />
+
+
+        <TextView
+            android:id="@+id/tv_movie_review_empty_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No reviews available"
+            app:layout_constraintTop_toTopOf="@id/rv_movie_review_detail"
+            app:layout_constraintBottom_toBottomOf="@id/rv_movie_review_detail"
+            app:layout_constraintLeft_toLeftOf="@id/rv_movie_review_detail"
+            app:layout_constraintRight_toRightOf="@id/rv_movie_review_detail"/>
 
 
     </android.support.constraint.ConstraintLayout>
