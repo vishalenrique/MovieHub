@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
@@ -130,8 +131,10 @@ public class DetailActivity extends AppCompatActivity implements DetailAdapter.O
             public void onClick(View v) {
                 if (isFavorite) {
                     mMovieFavorite.setImageResource(R.drawable.ic_favorite_border_red_48dp);
+                    Toast.makeText(DetailActivity.this, "Removed from favorites", Toast.LENGTH_SHORT).show();
                 } else {
                     mMovieFavorite.setImageResource(R.drawable.ic_favorite_red_48dp);
+                    Toast.makeText(DetailActivity.this, "Marked as favorite", Toast.LENGTH_SHORT).show();
                 }
                 databaseOperations(isFavorite);
                 isFavorite = !isFavorite;
